@@ -27,7 +27,7 @@
 仓库内置 GitHub Actions（[.github/workflows/predict.yml](.github/workflows/predict.yml)），每天北京时间 02/04/08/14/20 点自动在云端运行预测，并把最新结果提交到本仓库：
 
 - 最新预测结果：**[预测结果.md](预测结果.md)**（每次运行自动覆盖更新）
-- 开启 GitHub Pages 后（仓库 Settings → Pages → Branch 选 `main` / `root`），还可用浏览器直接访问 `https://<你的用户名>.github.io/ba-raid-forecast/`
+- 开启 GitHub Pages 后（仓库 Settings → Pages → Branch 选 `main` / `root`），还可用浏览器直接访问https://lusture1026.github.io/ba-raid-forecast/
 
 > 注意：云端运行依赖 GitHub 服务器能访问 arona.icu 接口，请先在 Actions 页面手动触发一次验证；若你的网络环境无法使用，也可以本地运行后把 `预测结果.md` 手动提交。
 
