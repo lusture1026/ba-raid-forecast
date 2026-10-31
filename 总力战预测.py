@@ -648,6 +648,13 @@ def print_live_block(quota, res):
             cp = round(t["proj"])
             parts.append(f"打穿带{'兜底（预计' + format(cp, ',') + '人）' if cp >= q else '同样危险（预计' + format(cp, ',') + '人）'}")
         print(f"  ◈ {head}{'；'.join(parts)}")
+    frozen_h = None
+    if res.get("_elapsed_h") and res.get("h_ref") is not None:
+        frozen_h = res["_elapsed_h"] - res["h_ref"]
+        if frozen_h > 24:
+            print(f"  ⚠ 站点数据管道冻结中：最后更新在开战后{res['h_ref']:.0f}小时，"
+                  f"已停更{frozen_h:.0f}小时（站点通常在定榜前后恢复）。"
+                  f"本预测以趋势锚为主，不依赖实时点，结论不受影响")
     if res["point"] >= q and res.get("drop_est"):
         de = res["drop_est"]
         end = parse_dt(res.get("_end") or res.get("_start"))
@@ -975,6 +982,8 @@ def main():
                 if res is not None and res.get("mode") == "live":
                     res["_start"] = target.get("startTime")
                     res["_end"] = target.get("endTime")
+                    res["_elapsed_h"] = (datetime.now(CST) - parse_dt(
+                        target["startTime"])).total_seconds() / 3600
             else:
                 target = nxt or FALLBACK_TARGET
                 if crypto is None:
