@@ -140,26 +140,53 @@ def decrypt(crypto, b64):
     return json.loads(crypto.f(crypto.o(2), b64))
 
 
+AUTH_HEADER = "2jhskfdgjldfgjldf-9639-kiuwoiruk"   # 官方API key的Header名（见官方文档）
+
+
+def load_api_key():
+    """官方API key：优先环境变量 ARONA_API_KEY，其次脚本同目录 api_key.txt（不入库）"""
+    k = os.environ.get("ARONA_API_KEY", "").strip()
+    if k:
+        return k
+    kf = os.path.join(BASE, "api_key.txt")
+    if os.path.exists(kf):
+        try:
+            return open(kf, encoding="utf-8").read().strip()
+        except Exception:
+            return ""
+    return ""
+
+
 def api_post(crypto, endpoint, params, retries=3):
     import urllib.request
     body = json.dumps({"crypt": encrypt_params(crypto, params)}).encode()
-    headers = {
+    base_headers = {
         "Content-Type": "application/json", "ba-language": "zh",
         "Origin": "https://arona.icu", "Referer": "https://arona.icu/raidRank",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
     }
-    for i in range(retries):
-        try:
-            req = urllib.request.Request("https://api.arona.icu" + endpoint, method="POST",
-                                         data=body, headers=headers)
-            j = json.loads(urllib.request.urlopen(req, timeout=30).read())
-            if j.get("crypt") and j.get("data"):
-                j["data"] = decrypt(crypto, j["data"])
-            return j
-        except Exception:
-            if i == retries - 1:
-                raise
-            time.sleep(2 * (i + 1))
+    api_key = load_api_key()
+    attempts = [(dict(base_headers, **{AUTH_HEADER: api_key}), "官方key")] if api_key else []
+    attempts.append((base_headers, "匿名"))
+    last_err = None
+    for headers, mode in attempts:
+        for i in range(retries):
+            try:
+                req = urllib.request.Request("https://api.arona.icu" + endpoint, method="POST",
+                                             data=body, headers=headers)
+                j = json.loads(urllib.request.urlopen(req, timeout=30).read())
+                if j.get("crypt") and j.get("data"):
+                    j["data"] = decrypt(crypto, j["data"])
+                return j
+            except Exception as e:
+                last_err = e
+                # 官方key被拒（4002/401/403类）时不再重试key通道，直接回退匿名
+                if mode == "官方key" and i == 0:
+                    break
+                if i == retries - 1:
+                    raise
+                time.sleep(2 * (i + 1))
+    raise last_err
 
 
 # ---------------- 人口外推核心（静默计算） ----------------

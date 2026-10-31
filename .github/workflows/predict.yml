@@ -20,6 +20,8 @@ jobs:
         run: pip install wasmtime
       - name: 运行预测
         run: python 总力战预测.py
+        env:
+          ARONA_API_KEY: ${{ secrets.ARONA_API_KEY }}
       - name: 提交预测结果与历史基准更新
         run: |
           git config user.name "github-actions[bot]"
