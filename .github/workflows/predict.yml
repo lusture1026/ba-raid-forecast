@@ -1,0 +1,28 @@
+name: 定时预测
+on:
+  schedule:
+    # UTC 0/6/12/18/20 点 = 北京时间 08/14/20/02/04 点（覆盖 04:00 结算后）
+    - cron: "0 0,6,12,18,20 * * *"
+  workflow_dispatch: {}   # 允许在 Actions 页面手动触发
+
+permissions:
+  contents: write
+
+jobs:
+  predict:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 安装依赖
+        run: pip install wasmtime
+      - name: 运行预测
+        run: python 总力战预测.py
+      - name: 提交预测结果与历史基准更新
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 历史基准.json 预测结果.md index.md
+          git diff --cached --quiet || (git commit -m "自动预测 $(TZ=Asia/Shanghai date +'%F %H:%M')" && git push)
