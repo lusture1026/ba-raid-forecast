@@ -996,12 +996,12 @@ def main():
 
     # 在线版（GitHub仓库/Pages 直接可看）：每次覆盖为最新报告
     nl = chr(10)
-    md = ("# 总力战TM通关人数预测（自动更新）" + nl * 2
+    md = ("# 总力战一档预测（适配官服B服）" + nl * 2
           + f"> 运行时间：{now.strftime('%Y-%m-%d %H:%M')}（北京时间）｜"
           + "数据来源：[什亭之匣 arona.icu](https://arona.icu)" + nl * 2
           + "```" + nl + report_buf.getvalue().rstrip() + nl + "```" + nl)
     for fn, head in (("预测结果.md", ""),
-                     ("index.md", "---" + nl + "title: 总力战TM通关人数预测（自动更新）"
+                     ("index.md", "---" + nl + "title: 总力战一档预测（适配官服B服）"
                       + nl + "---" + nl + nl)):
         try:
             open(os.path.join(BASE, fn), "w", encoding="utf-8").write(head + md)
