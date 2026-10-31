@@ -33,6 +33,15 @@
 
 > 注意：云端运行依赖 GitHub 服务器能访问 arona.icu 接口，请先在 Actions 页面手动触发一次验证；若你的网络环境无法使用，也可以本地运行后把 `预测结果.md` 手动提交。
 
+## 官方 API key（可选，推荐）
+
+什亭之匣提供官方API key（申请见站点"关于"页）。配置后脚本走官方认证通道（访问更稳、解锁分数分布等接口）：
+
+- **本地**：在脚本同目录新建 `api_key.txt`，把key粘贴进去（已被 .gitignore 排除，不会上传）；或设置环境变量 `ARONA_API_KEY`
+- **云端（Actions）**：仓库 Settings → Secrets and variables → Actions → New repository secret，名称 `ARONA_API_KEY`，值填key
+
+不配置key脚本也能正常运行（匿名通道）。认证Header与调用方式见站点官方接口文档。
+
 ## 预测原理（三句话版）
 
 - **跟上一期比**：同 Boss 同地图上次通关人数 × 历届复刻的增速规律。历史硬规律：成熟期同格复刻从未下降（最小 +15%）——开战初期数据少时靠它兜底。
